@@ -4,7 +4,6 @@ import il.ac.bgu.cs.bp.bpjs.context.ContextService;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.effectFunction.AddCell;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.effectFunction.AddPiece;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.effectFunction.Move;
-import il.ac.bgu.cs.bp.bpjs.context.examples.chess.effectFunction.PawnMove;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.schema.Cell;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.schema.Piece;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
@@ -16,10 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-/**
- * Created By: Assaf, On 16/02/2020
- * Description:
- */
 public class UCI implements Runnable
 {
     private BProgram program;
@@ -69,7 +64,6 @@ public class UCI implements Runnable
 
         this.program = contextService.getBProgram();
         this.program.setWaitForExternalEvents(true);
-
         contextService.run();
         try {
             Thread.sleep(5000);
