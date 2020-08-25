@@ -8,8 +8,8 @@ import java.util.HashMap;
 
 @Entity
 @NamedQueries(value = {
-        @NamedQuery(name = "RemovePiece", query = "DELETE FROM Piece p WHERE p = :piece"),
-        @NamedQuery(name = "WhitePieces", query = "SELECT p FROM Piece p WHERE p.color = 'White'"),
+        @NamedQuery(name = "RemovePiece", query = "DELETE FROM Piece p WHERE p = :piece"), // Piece.Remove
+        @NamedQuery(name = "WhitePieces", query = "SELECT p FROM Piece p WHERE p.color = 'White'"), //Piece.White
         @NamedQuery(name = "BlackPieces", query = "SELECT p FROM Piece p WHERE p.color = 'Black'"),
 })
 public class Piece extends BasicEntity
@@ -37,10 +37,6 @@ public class Piece extends BasicEntity
 
     private static HashMap<Type,Integer> whiteCounter = new HashMap<>();
     private static HashMap<Type,Integer> blackCounter = new HashMap<>();
-
-    public void updateLocation() {
-        //TODO: call db.
-    }
 
     public Piece()
     {

@@ -1,15 +1,15 @@
-function Move(source,target) {
-    return bp.Event("Move",{source:source,target:target});
+function Move(source, target) {
+    return bp.Event("Move", {source: source, target: target});
 }
 
 function AnyMoveFrom(source) {
-    return bp.EventSet("AnyMoveFrom "+ source, function (e) {
+    return bp.EventSet("AnyMoveFrom " + source, function (e) {
         return e.name.equals("Move") && e.data.source != null && e.data.source.equals(source);
     });
 }
 
 function AnyMoveTo(target) {
-    return bp.EventSet("AnyMoveTo "+ target, function (e) {
+    return bp.EventSet("AnyMoveTo " + target, function (e) {
         return e.name.equals("Move") && e.data.target != null && e.data.target.equals(target);
     });
 }
@@ -18,15 +18,15 @@ var moves = bp.EventSet("Moves", function (e) {
     return e.name.equals("Move");
 });
 
-var whiteMoves = bp.EventSet("White Moves",function (e) {
+var whiteMoves = bp.EventSet("White Moves", function (e) {
     return moves.contains(e) && (e.data.source.piece != null) && (Piece.Color.White.equals(e.data.source.piece.color));
 });
 
-var blackMoves = bp.EventSet("black Moves",function (e) {
+var blackMoves = bp.EventSet("black Moves", function (e) {
     return moves.contains(e) && (e.data.source.piece != null) && (Piece.Color.Black.equals(e.data.source.piece.color));
 });
 
-var outBoundsMoves = bp.EventSet("",function (e) {
+var outBoundsMoves = bp.EventSet("", function (e) {
     return moves.contains(e) && (e.data.source.row < 0 || e.data.source.row > 7 || e.data.source.col < 0 || e.data.source.col > 7 || e.data.target.row < 0 || e.data.target.row > 7 || e.data.target.col < 0 || e.data.target.col > 7);
 });
 
@@ -35,21 +35,18 @@ var donePopulationEvent = bp.EventSet("Start Event", function (e) {
 });
 
 // Requirement : Turn Base Game, White Starts
-bp.registerBThread("EnforceTurns",function ()
-{
-    bp.sync({waitFor:donePopulationEvent});
-    while (true)
-    {
-        bp.sync({waitFor:whiteMoves,block:blackMoves});
-        bp.sync({waitFor:blackMoves,block:whiteMoves});
+bp.registerBThread("EnforceTurns", function () {
+    bp.sync({waitFor: donePopulationEvent});
+    while (true) {
+        bp.sync({waitFor: whiteMoves, block: blackMoves});
+        bp.sync({waitFor: blackMoves, block: whiteMoves});
     }
 });
 
 // Requirement : Moving Pieces only inside the board bounds.  - not in wikipedia
-bp.registerBThread("Movement in bounds",function ()
-{
-    bp.sync({waitFor:donePopulationEvent});
-    bp.sync({block:outBoundsMoves});
+bp.registerBThread("Movement in bounds", function () {
+    bp.sync({waitFor: donePopulationEvent});
+    bp.sync({block: outBoundsMoves});
 });
 
 //<editor-fold desc="Pawn Rules">
@@ -58,7 +55,7 @@ function MovePawnOneForward(cell, forward) {
     if (cell.piece.didMove == false) {
         bp.sync({waitFor: donePopulationEvent});
     }
-    let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWith"+cell.piece.color+"Pawn", cell);
+    let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWith" + cell.piece.color + "Pawn", cell);
     let currentCell = cell;
     let targetCell = currentCell.shift(forward, 0);
     let occupiedTargetCellNewContextEvent = CTX.AnyNewContextEvent("NotEmptyCell", targetCell);
@@ -104,25 +101,29 @@ CTX.subscribe("BlackPawn - Move 1 forward", "CellsWithBlackPawn", function (cell
 });*/
 
 CTX.subscribe("Pawn - Move 2 forward", "UnmovedPawns", function (pawn) {
-    bp.sync({waitFor:donePopulationEvent});
-    var contextEndedEvent = CTX.AnyContextEndedEvent("UnmovedPawns",pawn);
+    bp.sync({waitFor: donePopulationEvent});
+    var contextEndedEvent = CTX.AnyContextEndedEvent("UnmovedPawns", pawn);
     let forward1 = pawn.color.equals(Piece.Color.Black) ? -1 : 1;
     var forward2 = forward1 * 2;
     var currentCell = pawn.cell;
     var targetCell = currentCell.shift(forward2, 0);
     var pathtotargetCell = currentCell.shift(forward1, 0);
-    let occupiedTargetCellNewContextEvent = CTX.AnyNewContextEvent("NotEmptyCell",targetCell);
-    let unoccupiedTargetCellNewContextEvent = CTX.AnyNewContextEvent("EmptyCell",targetCell);
-    let occupiedPathToTargetCellNewContextEvent = CTX.AnyNewContextEvent("NotEmptyCell",pathtotargetCell);
-    let unoccupiedPathToTargetCellNewContextEvent = CTX.AnyNewContextEvent("EmptyCell",pathtotargetCell);
-    while(true) {
-        if (targetCell.piece==null && pathtotargetCell.piece==null){
-            bp.sync({   request: Move(currentCell, targetCell), 
-                        waitFor:[occupiedTargetCellNewContextEvent,occupiedPathToTargetCellNewContextEvent],
-                        interrupt: contextEndedEvent});
-        }else{
-            bp.sync({   waitFor:[unoccupiedTargetCellNewContextEvent,unoccupiedPathToTargetCellNewContextEvent],
-                        interrupt: contextEndedEvent});
+    let occupiedTargetCellNewContextEvent = CTX.AnyNewContextEvent("NotEmptyCell", targetCell);
+    let unoccupiedTargetCellNewContextEvent = CTX.AnyNewContextEvent("EmptyCell", targetCell);
+    let occupiedPathToTargetCellNewContextEvent = CTX.AnyNewContextEvent("NotEmptyCell", pathtotargetCell);
+    let unoccupiedPathToTargetCellNewContextEvent = CTX.AnyNewContextEvent("EmptyCell", pathtotargetCell);
+    while (true) {
+        if (targetCell.piece == null && pathtotargetCell.piece == null) {
+            bp.sync({
+                request: Move(currentCell, targetCell),
+                waitFor: [occupiedTargetCellNewContextEvent, occupiedPathToTargetCellNewContextEvent],
+                interrupt: contextEndedEvent
+            });
+        } else {
+            bp.sync({
+                waitFor: [unoccupiedTargetCellNewContextEvent, unoccupiedPathToTargetCellNewContextEvent],
+                interrupt: contextEndedEvent
+            });
         }
         targetCell = currentCell.shift(forward2, 0);
         pathtotargetCell = currentCell.shift(forward1, 0);
@@ -135,27 +136,26 @@ function PawnCapturing(cell) {
     }
     let color = cell.piece.color;
     let opponentColor = color.equals(Piece.Color.Black) ? Piece.Color.White : Piece.Color.Black;
-    let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWith"+color+"Pawn", cell);
+    let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWith" + color + "Pawn", cell);
     let forward = color.equals(Piece.Color.Black) ? -1 : 1;
     let currentCell = cell;
     let targetCellR = null;
     let targetCellL = null;
-    if (currentCell.col + 1 <= 7) {
-        targetCellR = getCell(currentCell.row + forward, currentCell.col + 1);
-    } else {
-        targetCellR = getCell(currentCell.row + forward, currentCell.col - 1);
-    }
-    if (currentCell.col - 1 >= 0) {
-        targetCellL = getCell(currentCell.row + forward, currentCell.col - 1);
-    } else {
-        targetCellL = getCell(currentCell.row + forward, currentCell.col + 1);
-    }
-    let occupiedByOpponentTargetCellLNewContextEvent = CTX.AnyNewContextEvent("OccupiedBy" + opponentColor + "Piece", targetCellL);
-    let occupiedByOpponentTargetCellLContextEndedEvent = CTX.AnyContextEndedEvent("OccupiedBy" + opponentColor + "Piece", targetCellL);
-    let occupiedByOpponentTargetCellRNewContextEvent = CTX.AnyNewContextEvent("OccupiedBy" + opponentColor + "Piece", targetCellR);
-    let occupiedByOpponentTargetCellRContextEndedEvent = CTX.AnyContextEndedEvent("OccupiedBy" + opponentColor + "Piece", targetCellR);
-
     while (true) {
+        if (currentCell.col + 1 <= 7) {
+            targetCellR = currentCell.shift(forward, 1);
+        } else {
+            targetCellR = currentCell.shift(forward, -1);
+        }
+        if (currentCell.col - 1 >= 0) {
+            targetCellL = currentCell.shift(forward, -1);
+        } else {
+            targetCellL = currentCell.shift(forward, 1);
+        }
+        let occupiedByOpponentTargetCellLNewContextEvent = CTX.AnyNewContextEvent("OccupiedBy" + opponentColor + "Piece", targetCellL);
+        let occupiedByOpponentTargetCellLContextEndedEvent = CTX.AnyContextEndedEvent("OccupiedBy" + opponentColor + "Piece", targetCellL);
+        let occupiedByOpponentTargetCellRNewContextEvent = CTX.AnyNewContextEvent("OccupiedBy" + opponentColor + "Piece", targetCellR);
+        let occupiedByOpponentTargetCellRContextEndedEvent = CTX.AnyContextEndedEvent("OccupiedBy" + opponentColor + "Piece", targetCellR);
         if (targetCellR.piece != null && targetCellL.piece != null && targetCellR.piece.color.equals(opponentColor) && targetCellL.piece.color.equals(opponentColor)) {
             bp.sync({
                 request: [Move(currentCell, targetCellR), Move(currentCell, targetCellL)],
@@ -179,16 +179,6 @@ function PawnCapturing(cell) {
                 waitFor: [occupiedByOpponentTargetCellRNewContextEvent, occupiedByOpponentTargetCellLNewContextEvent],
                 interrupt: contextEndedEvent
             });
-        }
-        if (currentCell.col + 1 <= 7) {
-            targetCellR = currentCell.shift(forward, 1);
-        } else {
-            targetCellR = currentCell.shift(forward, -1);
-        }
-        if (currentCell.col - 1 >= 0) {
-            targetCellL = currentCell.shift(forward, -1);
-        } else {
-            targetCellL = currentCell.shift(forward, 1);
         }
     }
 }
