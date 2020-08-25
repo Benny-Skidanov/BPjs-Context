@@ -3,7 +3,7 @@ importPackage(Packages.il.ac.bgu.cs.bp.bpjs.context);
 var CTX = ContextService;
 var CTX_instance = ContextService.getInstance(); // DO NOT REMOVE: Here for verification
 
-function subscribe(subscribeId, ctxName, func, applyToCurrentInstances) {
+function subscribe(subscribeId, ctxName, func ,applyToCurrentInstances) {
     bp.registerBThread(subscribeId + "_ListenerBT", function() {
         while (true) {
             // Wrapping body with a function to avoid "Referencing mutable variable from closure"

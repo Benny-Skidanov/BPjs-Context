@@ -17,6 +17,10 @@ function registerCellsQueries()
                 "row": i,
                 "col": j
             });
+            CTX.registerParameterizedContextQuery("SpecificEmptyCell", "Cell[" + i + "," + j + "]", {
+                "row": i,
+                "col": j
+            });
         }
     }
 }
