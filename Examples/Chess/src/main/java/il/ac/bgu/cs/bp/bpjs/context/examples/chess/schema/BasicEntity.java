@@ -36,10 +36,6 @@ public abstract class BasicEntity implements Serializable{
         return id;
     }
 
-    public Object getUpdatedCopy() {
-        return ContextService.getUpdatedCopy(this);
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

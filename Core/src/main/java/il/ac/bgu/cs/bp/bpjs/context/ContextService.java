@@ -352,20 +352,6 @@ public class ContextService implements Serializable {
         return null;
     }
 
-    private Object innerGetUpdatedCopy(Object entity) {
-        for (CtxType ct : contextTypes) {
-            for(Object o : ct.activeContexts) {
-                if(o.equals(entity))
-                    return o;
-            }
-        }
-        return null;
-    }
-
-    public static Object getUpdatedCopy(Object entity) {
-        return getInstance().innerGetUpdatedCopy(entity);
-    }
-
     private static List<NamedQuery> findAllNamedQueries(EntityManagerFactory emf) {
         List<NamedQuery> namedQueries = Lists.newArrayList();
         Set<ManagedType<?>> managedTypes = emf.getMetamodel().getManagedTypes();
