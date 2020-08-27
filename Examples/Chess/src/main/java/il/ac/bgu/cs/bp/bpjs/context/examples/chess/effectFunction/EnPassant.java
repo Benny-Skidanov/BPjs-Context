@@ -18,18 +18,18 @@ public class EnPassant extends ContextService.EffectFunction
 
     @Override
     protected void innerExecution(EntityManager em, BEvent e) {
-        Map<String, Cell> data = (Map<String, Cell>) e.maybeData;
+        Map<String, Object> data = (Map<String, Object>) e.maybeData;
 
         Query q1 = em.createNamedQuery("UpdateCell");
         ContextService.setParameters(q1, new HashMap<>() {{
             put("piece", null);
-            put("cell", data.get("cell"));
+            put("cell", (Cell)data.get("cell"));
         }});
         q1.executeUpdate();
 
         Query q2 = em.createNamedQuery("RemovePiece");
         ContextService.setParameters(q2, new HashMap<>() {{
-            put("piece", data.get("piece"));
+            put("piece", (Piece)data.get("piece"));
         }});
         q2.executeUpdate();
     }
