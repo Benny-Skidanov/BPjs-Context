@@ -19,8 +19,12 @@ import javax.persistence.*;
         @NamedQuery(name = "CellsWithWhitePawn", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'White'"), // Cell.
         @NamedQuery(name = "PromotionCellsWithBlackPawn", query = "SELECT c FROM Cell c WHERE c.row=0 AND c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'Black'"), // Cell.
         @NamedQuery(name = "PromotionCellsWithWhitePawn", query = "SELECT c FROM Cell c WHERE c.row=7 AND c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'White'"), // Cell.
-        @NamedQuery(name = "EnPassantCellsWithBlackPawn", query = "SELECT c FROM Cell c WHERE c.row=3 AND c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'Black'"), // Cell.
-        @NamedQuery(name = "EnPassantCellsWithWhitePawn", query = "SELECT c FROM Cell c WHERE c.row=4 AND c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'White'"), // Cell.
+        @NamedQuery(name = "EnPassantCells", query = "SELECT eater, eaten FROM Cell eater, Cell eaten WHERE " +
+                "((eater.row=3 AND eater.piece IS NOT NULL AND eater.piece.type = 'Pawn' AND eater.piece.color = 'Black') AND " +
+                "(eaten.row=1 AND eaten.piece IS NOT NULL AND eaten.piece.type = 'Pawn' AND eaten.piece.color = 'White' AND (eaten.col=eater.col+1 OR eaten.col=eater.col-1)))" +
+                " OR " +
+                "((eater.row=4 AND eater.piece IS NOT NULL AND eater.piece.type = 'Pawn' AND eater.piece.color = 'White') AND " +
+                "(eaten.row=6 AND eaten.piece IS NOT NULL AND eaten.piece.type = 'Pawn' AND eaten.piece.color = 'Black' AND (eaten.col=eater.col+1 OR eaten.col=eater.col-1)))"), // Cell.
         //-------------------------
         @NamedQuery(name = "UpdateCell", query = "Update Cell c set c.piece=:piece where c=:cell"), // Cell.UpdatePiece
 })

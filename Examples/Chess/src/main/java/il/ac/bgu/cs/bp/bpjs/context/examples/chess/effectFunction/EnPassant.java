@@ -10,31 +10,27 @@ import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Promotion extends ContextService.EffectFunction
+public class EnPassant extends ContextService.EffectFunction
 {
-    public Promotion() {
-        super(bEvent -> bEvent.name.equals("Promotion"));
+    public EnPassant() {
+        super(bEvent -> bEvent.name.equals("EnPassant"));
     }
 
     @Override
     protected void innerExecution(EntityManager em, BEvent e) {
-        Map<String, Cell> data = (Map<String, Cell>) e.maybeData;
-        Cell source = data.get("source");
-        Piece changeToPiece =  new Piece(Piece.Type.Rook,source.piece.color);
+        Cell cell = (Cell) e.maybeData;
 
-        em.merge(changeToPiece);
+        Query q1 = em.createNamedQuery("UpdateCell");
+        ContextService.setParameters(q1, new HashMap<>() {{
+            put("piece", null);
+            put("cell", cell);
+        }});
+        q1.executeUpdate();
 
         Query q2 = em.createNamedQuery("RemovePiece");
         ContextService.setParameters(q2, new HashMap<>() {{
-            put("piece", source.piece);
+            put("piece", cell.piece);
         }});
         q2.executeUpdate();
-        
-        Query q3 = em.createNamedQuery("UpdateCell");
-        ContextService.setParameters(q3, new HashMap<>() {{
-            put("piece", changeToPiece);
-            put("cell", source);
-        }});
-        q3.executeUpdate();
     }
 }

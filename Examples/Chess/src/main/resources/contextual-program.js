@@ -1,6 +1,11 @@
 function Move(source, target) {
     return bp.Event("Move", {source: source, target: target});
 }
+
+function EnPassant(piece) {
+    return bp.Event("EnPassant", piece);
+}
+
 function Promotion(source) {
     return bp.Event("Promotion", {source: source});
 }
@@ -59,7 +64,7 @@ bp.registerBThread("AfterPopulation", function () {
     function MovePawnOneForward(cell, forward) {
         let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWith" + cell.piece.color + "Pawn", cell);
         let currentCell = cell;
-        if (currentCell.row == 0 || currentCell.row == 7){
+        if (currentCell.row == 0 || currentCell.row == 7) {
             return;
         }
         let targetCell = currentCell.shift(forward, 0);
@@ -82,13 +87,13 @@ bp.registerBThread("AfterPopulation", function () {
         }
     }
 
-    CTX.subscribe("WhitePawn - Move 1 forward", "CellsWithWhitePawn", function (cell) {
+/*    CTX.subscribe("WhitePawn - Move 1 forward", "CellsWithWhitePawn", function (cell) {
         MovePawnOneForward(cell, 1);
     }, true);
 
     CTX.subscribe("BlackPawn - Move 1 forward", "CellsWithBlackPawn", function (cell) {
         MovePawnOneForward(cell, -1);
-    }, true);
+    }, true);*/
 
     /*CTX.subscribe("WhitePawn - Move 1 forward - other option", "CellsWithWhitePawn", function (cell) {
         if (cell.piece.didMove == false){
@@ -110,7 +115,7 @@ bp.registerBThread("AfterPopulation", function () {
         let forward1 = pawn.color.equals(Piece.Color.Black) ? -1 : 1;
         var forward2 = forward1 * 2;
         var currentCell = pawn.cell;
-        if (currentCell.row == 0 || currentCell.row == 7){
+        if (currentCell.row == 0 || currentCell.row == 7) {
             return;
         }
         var targetCell = currentCell.shift(forward2, 0);
@@ -146,7 +151,7 @@ bp.registerBThread("AfterPopulation", function () {
         let targetCellR = null;
         let targetCellL = null;
         while (true) {
-            if (currentCell.row == 0 || currentCell.row == 7){
+            if (currentCell.row == 0 || currentCell.row == 7) {
                 break;
             }
             if (currentCell.col + 1 <= 7) {
@@ -203,47 +208,24 @@ bp.registerBThread("AfterPopulation", function () {
     }, true);
 
     CTX.subscribe("BlackPawn - Promotion", "PromotionCellsWithBlackPawn", function (cell) {
-        bp.sync({request: Promotion(cell), block: moves})  
+        bp.sync({request: Promotion(cell), block: moves})
     }, true);
 
-    CTX.subscribe("WhitePawn - Capturing en passant", "EnPassantCellsWithWhitePawn", function (cell) {
-        PawnEnPassant(cell)
-    }, true);
-
-    CTX.subscribe("BlackPawn - Capturing en passant", "EnPassantCellsWithBlackPawn", function (cell) {
-        PawnEnPassant(cell)
-    }, true);
-
-    function PawnEnPassant(cell) {
-        let color = cell.piece.color;
-        let contextEndedEvent = CTX.AnyContextEndedEvent("EnPassantCellsWith" + color + "Pawn", cell);
-        let forward = color.equals(Piece.Color.Black) ? -2 : 2;
-        let currentCell = cell;
-        let pawnCellR = null;
-        let pawnCellL = null;
-        if (currentCell.col + 1 <= 7) {
-            pawnCellR = currentCell.shift(forward, 1);
-        } else {
-            pawnCellR = currentCell.shift(forward, -1);
-        }
-        if (currentCell.col - 1 >= 0) {
-            pawnCellL = currentCell.shift(forward, -1);
-        } else {
-            pawnCellL = currentCell.shift(forward, 1);
-        }
-        for (i=0;i<2;i++){
-            let e1 = bp.sync({
-                        waitFor: [Move(pawnCellR, pawnCellR.shift(-forward, 0)),Move(pawnCellL, pawnCellL.shift(-forward, 0))],
-                        interrupt: contextEndedEvent
+    CTX.subscribe("Capturing en passant", "EnPassantCells", function (cells) {
+        let eater = cells.get(0);
+        let eaten = cells.get(1);
+        let contextEndedEvent = CTX.AnyContextEndedEvent("EnPassantCells", cells);
+        let forward = eater.piece.color.equals(Piece.Color.Black) ? -1 : 1;
+        let target = bp.sync({waitFor: AnyMoveFrom(eaten), interrupt: contextEndedEvent}).data.target;
+        let enPassantMove = Move(eater, eater.shift(forward, eaten.col-eater.col));
+        if(Math.abs(target.row-eaten.row)==2) {
+            let e = bp.sync({
+                request: enPassantMove,
+                waitFor: moves
             });
-            let e2 = bp.sync({
-                        request: Move(cell, e1.source.shift(-forward/2, 0)),
-                        waitFor:moves,
-                        interrupt: contextEndedEvent
-            });
-            if (e2.equals(Move(cell, e.source.shift(-forward/2, 0)))){
-                bp.sync({request: EnPassant(cell,e1.source), block: moves})
+            if (e.equals(enPassantMove)) {
+                bp.sync({request: EnPassant(eaten.piece), block: moves})
             }
         }
-    }
+    }, true);
 });
