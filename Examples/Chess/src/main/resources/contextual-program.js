@@ -1,6 +1,10 @@
 function Move(source, target) {
     return bp.Event("Move", {source: source, target: target});
 }
+function Promotion(source) {
+    return bp.Event("Promotion", {source: source});
+}
+
 
 function AnyMoveFrom(source) {
     return bp.EventSet("AnyMoveFrom " + source, function (e) {
@@ -55,6 +59,9 @@ bp.registerBThread("AfterPopulation", function () {
     function MovePawnOneForward(cell, forward) {
         let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWith" + cell.piece.color + "Pawn", cell);
         let currentCell = cell;
+        if (currentCell.row == 0 || currentCell.row == 7){
+            return;
+        }
         let targetCell = currentCell.shift(forward, 0);
         let occupiedTargetCellNewContextEvent = CTX.AnyNewContextEvent("NotEmptyCell", targetCell);
         let unoccupiedTargetCellNewContextEvent = CTX.AnyNewContextEvent("EmptyCell", targetCell);
@@ -103,6 +110,9 @@ bp.registerBThread("AfterPopulation", function () {
         let forward1 = pawn.color.equals(Piece.Color.Black) ? -1 : 1;
         var forward2 = forward1 * 2;
         var currentCell = pawn.cell;
+        if (currentCell.row == 0 || currentCell.row == 7){
+            return;
+        }
         var targetCell = currentCell.shift(forward2, 0);
         var pathtotargetCell = currentCell.shift(forward1, 0);
         let occupiedTargetCellNewContextEvent = CTX.AnyNewContextEvent("NotEmptyCell", targetCell);
@@ -136,6 +146,9 @@ bp.registerBThread("AfterPopulation", function () {
         let targetCellR = null;
         let targetCellL = null;
         while (true) {
+            if (currentCell.row == 0 || currentCell.row == 7){
+                break;
+            }
             if (currentCell.col + 1 <= 7) {
                 targetCellR = currentCell.shift(forward, 1);
             } else {
@@ -166,7 +179,7 @@ bp.registerBThread("AfterPopulation", function () {
                 bp.sync({
                     request: Move(currentCell, targetCellL),
                     waitFor: [occupiedByOpponentTargetCellLContextEndedEvent, occupiedByOpponentTargetCellRNewContextEvent],
-                    interrupt: [contextEndedEvent]
+                    interrupt: contextEndedEvent
                 });
             } else {
                 bp.sync({
@@ -185,5 +198,52 @@ bp.registerBThread("AfterPopulation", function () {
         PawnCapturing(cell);
     }, true);
 
+    CTX.subscribe("WhitePawn - Promotion", "PromotionCellsWithWhitePawn", function (cell) {
+        bp.sync({request: Promotion(cell), block: moves})
+    }, true);
 
+    CTX.subscribe("BlackPawn - Promotion", "PromotionCellsWithBlackPawn", function (cell) {
+        bp.sync({request: Promotion(cell), block: moves})  
+    }, true);
+
+    CTX.subscribe("WhitePawn - Capturing en passant", "EnPassantCellsWithWhitePawn", function (cell) {
+        PawnEnPassant(cell)
+    }, true);
+
+    CTX.subscribe("BlackPawn - Capturing en passant", "EnPassantCellsWithBlackPawn", function (cell) {
+        PawnEnPassant(cell)
+    }, true);
+
+    function PawnEnPassant(cell) {
+        let color = cell.piece.color;
+        let contextEndedEvent = CTX.AnyContextEndedEvent("EnPassantCellsWith" + color + "Pawn", cell);
+        let forward = color.equals(Piece.Color.Black) ? -2 : 2;
+        let currentCell = cell;
+        let pawnCellR = null;
+        let pawnCellL = null;
+        if (currentCell.col + 1 <= 7) {
+            pawnCellR = currentCell.shift(forward, 1);
+        } else {
+            pawnCellR = currentCell.shift(forward, -1);
+        }
+        if (currentCell.col - 1 >= 0) {
+            pawnCellL = currentCell.shift(forward, -1);
+        } else {
+            pawnCellL = currentCell.shift(forward, 1);
+        }
+        for (i=0;i<2;i++){
+            let e1 = bp.sync({
+                        waitFor: [Move(pawnCellR, pawnCellR.shift(-forward, 0)),Move(pawnCellL, pawnCellL.shift(-forward, 0))],
+                        interrupt: contextEndedEvent
+            });
+            let e2 = bp.sync({
+                        request: Move(cell, e1.source.shift(-forward/2, 0)),
+                        waitFor:moves,
+                        interrupt: contextEndedEvent
+            });
+            if (e2.equals(Move(cell, e.source.shift(-forward/2, 0)))){
+                bp.sync({request: EnPassant(cell,e1.source), block: moves})
+            }
+        }
+    }
 });

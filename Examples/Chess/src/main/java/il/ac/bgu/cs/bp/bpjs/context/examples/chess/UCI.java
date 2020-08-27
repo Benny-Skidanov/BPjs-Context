@@ -4,6 +4,7 @@ import il.ac.bgu.cs.bp.bpjs.context.ContextService;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.effectFunction.AddCell;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.effectFunction.AddPiece;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.effectFunction.Move;
+import il.ac.bgu.cs.bp.bpjs.context.examples.chess.effectFunction.Promotion;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.schema.Cell;
 import il.ac.bgu.cs.bp.bpjs.context.examples.chess.schema.Piece;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
@@ -29,6 +30,7 @@ public class UCI implements Runnable
         contextService.addEffectFunction(new AddCell());
         contextService.addEffectFunction(new AddPiece());
         contextService.addEffectFunction(new Move());
+        contextService.addEffectFunction(new Promotion());
 //        contextService.addEffectFunction(new PawnMove());
 
         contextService.addListener(new BProgramRunnerListenerAdapter() {

@@ -17,6 +17,10 @@ import javax.persistence.*;
         @NamedQuery(name = "CellsWithPawn", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Pawn'"), // Cell.
         @NamedQuery(name = "CellsWithBlackPawn", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'Black'"), // Cell.
         @NamedQuery(name = "CellsWithWhitePawn", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'White'"), // Cell.
+        @NamedQuery(name = "PromotionCellsWithBlackPawn", query = "SELECT c FROM Cell c WHERE c.row=0 AND c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'Black'"), // Cell.
+        @NamedQuery(name = "PromotionCellsWithWhitePawn", query = "SELECT c FROM Cell c WHERE c.row=7 AND c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'White'"), // Cell.
+        @NamedQuery(name = "EnPassantCellsWithBlackPawn", query = "SELECT c FROM Cell c WHERE c.row=3 AND c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'Black'"), // Cell.
+        @NamedQuery(name = "EnPassantCellsWithWhitePawn", query = "SELECT c FROM Cell c WHERE c.row=4 AND c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'White'"), // Cell.
         //-------------------------
         @NamedQuery(name = "UpdateCell", query = "Update Cell c set c.piece=:piece where c=:cell"), // Cell.UpdatePiece
 })
