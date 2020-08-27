@@ -142,7 +142,12 @@ public class ContextService implements Serializable {
         }
 
         private void updateActive() {
-            this.activeContexts = this.createQuery().getResultList();
+            this.activeContexts = (List<?>) this.createQuery().getResultList().stream()
+                    .map(o->o instanceof Object[] ?
+                            Arrays.asList((Object[])o) :
+                            o)
+                    .collect(Collectors.toList());
+//            this.activeContexts = this.createQuery().getResultList();
         }
     }
 
