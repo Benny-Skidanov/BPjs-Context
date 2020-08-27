@@ -87,13 +87,13 @@ bp.registerBThread("AfterPopulation", function () {
         }
     }
 
-/*    CTX.subscribe("WhitePawn - Move 1 forward", "CellsWithWhitePawn", function (cell) {
+    CTX.subscribe("WhitePawn - Move 1 forward", "CellsWithWhitePawn", function (cell) {
         MovePawnOneForward(cell, 1);
     }, true);
 
     CTX.subscribe("BlackPawn - Move 1 forward", "CellsWithBlackPawn", function (cell) {
         MovePawnOneForward(cell, -1);
-    }, true);*/
+    }, true);
 
     /*CTX.subscribe("WhitePawn - Move 1 forward - other option", "CellsWithWhitePawn", function (cell) {
         if (cell.piece.didMove == false){
