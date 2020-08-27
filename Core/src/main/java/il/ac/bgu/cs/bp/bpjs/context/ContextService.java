@@ -349,7 +349,7 @@ public class ContextService implements Serializable {
                 return ct.activeContexts;
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private static List<NamedQuery> findAllNamedQueries(EntityManagerFactory emf) {
