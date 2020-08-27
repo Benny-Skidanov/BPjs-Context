@@ -2,8 +2,8 @@ function Move(source, target) {
     return bp.Event("Move", {source: source, target: target});
 }
 
-function EnPassant(piece) {
-    return bp.Event("EnPassant", piece);
+function EnPassant(piece, cell) {
+    return bp.Event("EnPassant", {piece:piece, cell:cell});
 }
 
 function Promotion(source) {
@@ -224,7 +224,7 @@ bp.registerBThread("AfterPopulation", function () {
                 waitFor: moves
             });
             if (e.equals(enPassantMove)) {
-                bp.sync({request: EnPassant(eaten.piece), block: moves})
+                bp.sync({request: EnPassant(eaten.piece, target), block: moves})
             }
         }
     }, true);
