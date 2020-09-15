@@ -50,20 +50,28 @@ function getCell(i,j){
 }
 
 function getRow(i){
-    return CTX.getContextInstances("SpecificRow["+i+"]");
+    let row = CTX.getContextInstances("SpecificRow["+i+"]");
+    Collections.sort(row);
+    return row;
 }
 
 function getColumn(j){
-    return CTX.getContextInstances("SpecificColumn["+j+"]");
+    let col = CTX.getContextInstances("SpecificColumn["+j+"]");
+    Collections.sort(col);
+    return col;
 }
 
 
 function getDiagonalP(i,j){
-    return CTX.getContextInstances("SpecificDiagonalP[" + i + "," + j + "]");
+    let diag = CTX.getContextInstances("SpecificDiagonalP[" + i + "," + j + "]");
+    Collections.sort(diag);
+    return diag;
 }
 
 function getDiagonalN(i,j){
-    return CTX.getContextInstances("SpecificDiagonalN[" + i + "," + j + "]");
+    let diag = CTX.getContextInstances("SpecificDiagonalN[" + i + "," + j + "]");
+    Collections.sort(diag);
+    return diag;
 }
 
 

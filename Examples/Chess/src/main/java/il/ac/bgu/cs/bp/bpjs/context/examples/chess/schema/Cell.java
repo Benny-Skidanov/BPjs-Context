@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.context.examples.chess.schema;
 
 import il.ac.bgu.cs.bp.bpjs.context.ContextService;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
 
@@ -37,8 +38,7 @@ import javax.persistence.*;
         //-------------------------
         @NamedQuery(name = "UpdateCell", query = "Update Cell c set c.piece=:piece where c=:cell"), // Cell.UpdatePiece
 })
-public class Cell extends BasicEntity
-{
+public class Cell extends BasicEntity implements Comparable<Cell> {
     @Column
     public final int row;
     @Column
@@ -46,16 +46,14 @@ public class Cell extends BasicEntity
     @OneToOne
     public Piece piece;
 
-    public Cell()
-    {
+    public Cell() {
         super();
         row = -1;
         col = -1;
         this.piece = null;
     }
 
-    public Cell(int row, int col)
-    {
+    public Cell(int row, int col) {
         super("Cell[" + row + "," + col + "]");
         this.row = row;
         this.col = col;
@@ -64,10 +62,17 @@ public class Cell extends BasicEntity
 
     @Override
     public String toString() {
-        return "Cell[" + row + "," + col + ","+piece+"]";
+        return "Cell[" + row + "," + col + "," + piece + "]";
     }
 
     public Cell shift(int i, int j) {
-        return (Cell) ContextService.getContextInstances("Cell["+(row+i)+","+(col+j)+"]").get(0);
+        return (Cell) ContextService.getContextInstances("Cell[" + (row + i) + "," + (col + j) + "]").get(0);
+    }
+
+
+    @Override
+    public int compareTo(@NotNull Cell o) {
+        int i = Integer.compare(row, o.row);
+        return i == 0 ? Integer.compare(col, o.col) : i;
     }
 }
