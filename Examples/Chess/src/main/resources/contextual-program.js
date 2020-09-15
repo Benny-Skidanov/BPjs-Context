@@ -410,25 +410,26 @@ bp.registerBThread("AfterPopulation", function () {
         let propertyAccessor;
         let elseValue;
         let inTheRightDirection;
+
         switch (direction) {
             case("top"):
-                propertyAccessor = c => c.col;
-                inTheRightDirection = c => start.compareTo(c) < 0;
+                propertyAccessor = c => c.row;
+                inTheRightDirection = c => Integer.compare(start.row, c.row) < 0;
                 elseValue = Math.min(8, start.row + depth);
                 break;
             case("bottom"):
-                propertyAccessor = c => c.col;
-                inTheRightDirection = c => start.compareTo(c) > 0;
+                propertyAccessor = c => c.row;
+                inTheRightDirection = c => Integer.compare(start.row, c.row) > 0;
                 elseValue = Math.max(-1, start.row - depth);
                 break;
             case("right"):
-                propertyAccessor = c => c.row;
-                inTheRightDirection = c => start.compareTo(c) < 0;
+                propertyAccessor = c => c.col;
+                inTheRightDirection = c => Integer.compare(start.col, c.col) < 0;
                 elseValue = Math.min(8, start.col + depth);
                 break;
             case("left"):
-                propertyAccessor = c => c.row;
-                inTheRightDirection = c => start.compareTo(c) > 0;
+                propertyAccessor = c => c.col;
+                inTheRightDirection = c => Integer.compare(start.col, c.col) > 0;
                 elseValue = Math.max(-1, start.col - depth);
                 break;
         }
