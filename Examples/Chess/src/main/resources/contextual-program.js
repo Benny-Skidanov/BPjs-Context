@@ -228,4 +228,389 @@ bp.registerBThread("AfterPopulation", function () {
             }
         }
     }, true);
+
+//<editor-fold desc="Rook Rules">
+    
+    CTX.subscribe("WhiteRook - Move", "CellsWithWhiteRook", function (cell) {
+        let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWithWhiteRook", cell);
+        while (true){
+            let rookMoves = [];
+            FindPossibleRowMoves(cell, 7, rookMoves);
+            FindPossibleColumnMoves(cell, 7, rookMoves);        
+            if (rookMoves.length>0){
+                bp.sync({
+                    request: rookMoves,
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }else{
+                bp.sync({
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }
+        }
+    }, true);
+
+    CTX.subscribe("WhiteRook - Capturing", "CellsWithWhiteRook", function (cell) {
+        let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWithWhiteRook", cell);
+        while (true){
+            let rookCaptures = [];
+            FindPossibleRowCaptures(cell, 7, rookCaptures);
+            FindPossibleColumnCaptures(cell, 7, rookCaptures);        
+            if (rookCaptures.length>0){
+                bp.sync({
+                    request: rookCaptures,
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }else{
+                bp.sync({
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }
+        }
+    }, true);
+
+    CTX.subscribe("BlackRook - Move", "CellsWithBlackRook", function (cell) {
+        let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWithBlackRook", cell);
+        while (true){
+            let rookMoves = [];
+            FindPossibleRowMoves(cell, 7, rookMoves);
+            FindPossibleColumnMoves(cell, 7, rookMoves);      
+            if (rookMoves.length>0){
+                bp.sync({
+                    request: rookMoves,
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }else{
+                bp.sync({
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }
+        }
+    }, true);
+
+    CTX.subscribe("BlackRook - Capturing", "CellsWithBlackRook", function (cell) {
+        let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWithBlackRook", cell);
+        while (true){
+            let rookCaptures = [];
+            FindPossibleRowCaptures(cell, 7, rookCaptures);
+            FindPossibleColumnCaptures(cell, 7, rookCaptures);        
+            if (rookCaptures.length>0){
+                bp.sync({
+                    request: rookCaptures,
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }else{
+                bp.sync({
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }
+        }
+    }, true);
+
+    //<editor-fold desc="Bishop Rules">
+    
+    CTX.subscribe("WhiteBishop - Move", "CellsWithWhiteBishop", function (cell) {
+        let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWithWhiteBishop", cell);
+        while (true){
+            let BishopMoves = [];
+            FindPossibleDiagonal_P_Moves(cell, 7, BishopMoves);
+            FindPossibleDiagonal_N_Moves(cell, 7, BishopMoves);        
+            if (BishopMoves.length>0){
+                bp.sync({
+                    request: BishopMoves,
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }else{
+                bp.sync({
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }
+        }
+    }, true);
+
+    CTX.subscribe("WhiteBishop - Capturing", "CellsWithWhiteBishop", function (cell) {
+        let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWithWhiteBishop", cell);
+        while (true){
+            let BishopCaptures = [];
+            FindPossibleDiagonal_P_Captures(cell, 7, BishopCaptures);
+            FindPossibleDiagonal_N_Captures(cell, 7, BishopCaptures);        
+            if (BishopCaptures.length>0){
+                bp.sync({
+                    request: BishopCaptures,
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }else{
+                bp.sync({
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }
+        }
+    }, true);
+
+    CTX.subscribe("BlackBishop - Move", "CellsWithBlackBishop", function (cell) {
+        let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWithBlackBishop", cell);
+        while (true){
+            let BishopMoves = [];
+            FindPossibleDiagonal_P_Moves(cell, 7, BishopMoves);
+            FindPossibleDiagonal_N_Moves(cell, 7, BishopMoves);        
+            if (BishopMoves.length>0){
+                bp.sync({
+                    request: BishopMoves,
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }else{
+                bp.sync({
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }
+        }
+    }, true);
+
+    CTX.subscribe("BlackBishop - Capturing", "CellsWithBlackBishop", function (cell) {
+        let contextEndedEvent = CTX.AnyContextEndedEvent("CellsWithBlackBishop", cell);
+        while (true){
+            let BishopCaptures = [];
+            FindPossibleDiagonal_P_Captures(cell, 7, BishopCaptures);
+            FindPossibleDiagonal_N_Captures(cell, 7, BishopCaptures);        
+            if (BishopCaptures.length>0){
+                bp.sync({
+                    request: BishopCaptures,
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }else{
+                bp.sync({
+                    waitFor: moves,
+                    interrupt: contextEndedEvent
+                });
+            }
+        }
+    }, true);
+
+
+
+   
+    function FindPossibleRowMoves(cell, depthOfMove, possibleMoves) {
+        let rowCells=getRow(cell.row);
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell = rowCells.stream().filter(rowCell => (rowCell.col == cell.col + index && rowCell.piece == null)).findFirst();
+            if (theCell.isPresent()) {
+                possibleMoves.push(Move(cell, theCell.get()));
+            } else {
+                break;
+            }
+        }
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell = rowCells.stream().filter(rowCell => (rowCell.col == cell.col - index && rowCell.piece == null)).findFirst();
+            if (theCell.isPresent()) {
+                possibleMoves.push(Move(cell, theCell.get()));
+            } else {
+                break;
+            }
+        }
+    }
+
+    function FindPossibleColumnMoves(cell, depthOfMove, possibleMoves) {
+        let colCells=getColumn(cell.col);
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell = colCells.stream().filter(colCell => (colCell.row == cell.row + index && colCell.piece == null)).findFirst();
+            if (theCell.isPresent()) {
+                possibleMoves.push(Move(cell, theCell.get()));
+            } else {
+                break;
+            }
+        }
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell = colCells.stream().filter(colCell => (colCell.row == cell.row - index && colCell.piece == null)).findFirst();
+            if (theCell.isPresent()) {
+                possibleMoves.push(Move(cell, theCell.get()));
+            } else {
+                break;
+            }
+        }
+    }
+
+    function FindPossibleRowCaptures(cell, depthOfMove, possibleCaptures) {
+        let rowCells=getRow(cell.row);
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell=rowCells.stream().filter(rowCell=>(rowCell.col==cell.col+index)).findFirst();
+            if (theCell.isPresent()){
+                theCell=theCell.get();
+                if (theCell.piece!=null){
+                    if (!theCell.piece.color.equals(cell.piece.color)){
+                        possibleCaptures.push(Move(cell, theCell));
+                    }
+                    break;
+                }
+            }else{
+                break;
+            }
+        }
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell=rowCells.stream().filter(rowCell=>(rowCell.col==cell.col-index)).findFirst();
+            if (theCell.isPresent()){
+                theCell=theCell.get();
+                if (theCell.piece!=null){
+                    if (!theCell.piece.color.equals(cell.piece.color)){
+                        possibleCaptures.push(Move(cell, theCell));
+                    }
+                    break;
+                }
+            }else{
+                break;
+            }
+        }
+    }
+
+    function FindPossibleColumnCaptures(cell, depthOfMove, possibleCaptures) {
+        let colCells=getColumn(cell.col);
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell=colCells.stream().filter(colCell=>(colCell.row==cell.row+index)).findFirst();
+            if (theCell.isPresent()){
+                theCell=theCell.get();
+                if (theCell.piece!=null){
+                    if (!theCell.piece.color.equals(cell.piece.color)){
+                        possibleCaptures.push(Move(cell, theCell));
+                    }
+                    break;
+                }
+            }else{
+                break;
+            }
+        }
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell=colCells.stream().filter(colCell=>(colCell.row==cell.row-index)).findFirst();
+            if (theCell.isPresent()){
+                theCell=theCell.get();
+                if (theCell.piece!=null){
+                    if (!theCell.piece.color.equals(cell.piece.color)){
+                        possibleCaptures.push(Move(cell, theCell));
+                    }
+                    break;
+                }
+            }else{
+                break;
+            }
+        }
+    }
+
+    function FindPossibleDiagonal_P_Moves(cell, depthOfMove, possibleMoves) {
+        let Diagonal_P_Cells=getDiagonalP(cell.row, cell.col);
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell = Diagonal_P_Cells.stream().filter(diagCell => (diagCell.row == cell.row + index && diagCell.col == cell.col + index && diagCell.piece == null)).findFirst();
+            if (theCell.isPresent()) {
+                possibleMoves.push(Move(cell, theCell.get()));
+            } else {
+                break;
+            }
+        }
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell = Diagonal_P_Cells.stream().filter(diagCell => (diagCell.row == cell.row - index && diagCell.col == cell.col - index && diagCell.piece == null)).findFirst();
+            if (theCell.isPresent()) {
+                possibleMoves.push(Move(cell, theCell.get()));
+            } else {
+                break;
+            }
+        }
+    }
+
+    function FindPossibleDiagonal_N_Moves(cell, depthOfMove, possibleMoves) {
+        let Diagonal_N_Cells=getDiagonalN(cell.row, cell.col);
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell = Diagonal_N_Cells.stream().filter(diagCell => (diagCell.row == cell.row + index && diagCell.col == cell.col - index && diagCell.piece == null)).findFirst();
+            if (theCell.isPresent()) {
+                possibleMoves.push(Move(cell, theCell.get()));
+            } else {
+                break;
+            }
+        }
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell = Diagonal_N_Cells.stream().filter(diagCell => (diagCell.row == cell.row - index && diagCell.col == cell.col + index && diagCell.piece == null)).findFirst();
+            if (theCell.isPresent()) {
+                possibleMoves.push(Move(cell, theCell.get()));
+            } else {
+                break;
+            }
+        }
+    }
+
+    function FindPossibleDiagonal_P_Captures(cell, depthOfMove, possibleCaptures) {
+        let Diagonal_P_Cells=getDiagonalP(cell.row, cell.col);
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell=Diagonal_P_Cells.stream().filter(diagCell=>(diagCell.row == cell.row + index && diagCell.col == cell.col + index)).findFirst();
+            if (theCell.isPresent()){
+                theCell=theCell.get();
+                if (theCell.piece!=null){
+                    if (!theCell.piece.color.equals(cell.piece.color)){
+                        possibleCaptures.push(Move(cell, theCell));
+                    }
+                    break;
+                }
+            }else{
+                break;
+            }
+        }
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell=Diagonal_P_Cells.stream().filter(diagCell=>(diagCell.row == cell.row - index && diagCell.col == cell.col - index)).findFirst();
+            if (theCell.isPresent()){
+                theCell=theCell.get();
+                if (theCell.piece!=null){
+                    if (!theCell.piece.color.equals(cell.piece.color)){
+                        possibleCaptures.push(Move(cell, theCell));
+                    }
+                    break;
+                }
+            }else{
+                break;
+            }
+        }
+    }
+
+    function FindPossibleDiagonal_N_Captures(cell, depthOfMove, possibleCaptures) {
+        let Diagonal_N_Cells=getDiagonalN(cell.row, cell.col);
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell=Diagonal_N_Cells.stream().filter(diagCell=>(diagCell.row == cell.row + index && diagCell.col == cell.col - index)).findFirst();
+            if (theCell.isPresent()){
+                theCell=theCell.get();
+                if (theCell.piece!=null){
+                    if (!theCell.piece.color.equals(cell.piece.color)){
+                        possibleCaptures.push(Move(cell, theCell));
+                    }
+                    break;
+                }
+            }else{
+                break;
+            }
+        }
+        for (let index = 1; index <= depthOfMove; index++) {
+            let theCell=Diagonal_N_Cells.stream().filter(diagCell=>(diagCell.row == cell.row - index && diagCell.col == cell.col + index)).findFirst();
+            if (theCell.isPresent()){
+                theCell=theCell.get();
+                if (theCell.piece!=null){
+                    if (!theCell.piece.color.equals(cell.piece.color)){
+                        possibleCaptures.push(Move(cell, theCell));
+                    }
+                    break;
+                }
+            }else{
+                break;
+            }
+        }
+    }
 });
+
+// bp.log.info("\n\n\n***********rookCell: " + theCell + "********\n\n\n");

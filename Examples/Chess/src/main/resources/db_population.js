@@ -11,6 +11,10 @@ function registerCellsQueries()
 {
     for (var i = 0; i < 8; i++)
     {
+        CTX.registerParameterizedContextQuery("SpecificRow", "SpecificRow[" + i + "]", {
+            "row": i
+        });
+
         for (var j = 0; j < 8; j++)
         {
             CTX.registerParameterizedContextQuery("SpecificCell", "Cell[" + i + "," + j + "]", {
@@ -21,7 +25,21 @@ function registerCellsQueries()
                 "row": i,
                 "col": j
             });
+            CTX.registerParameterizedContextQuery("SpecificDiagonalP", "SpecificDiagonalP[" + i + "," + j + "]", {
+                "row": i,
+                "col": j
+            });
+            CTX.registerParameterizedContextQuery("SpecificDiagonalN", "SpecificDiagonalN[" + i + "," + j + "]", {
+                "row": i,
+                "col": j
+            });
         }
+    }
+    for (var j = 0; j < 8; j++)
+    {
+        CTX.registerParameterizedContextQuery("SpecificColumn", "SpecificColumn[" + j + "]", {
+            "col": j
+        });
     }
 }
 
@@ -30,6 +48,24 @@ registerCellsQueries();
 function getCell(i,j){
     return CTX.getContextInstances("Cell["+i+","+j+"]").get(0);
 }
+
+function getRow(i){
+    return CTX.getContextInstances("SpecificRow["+i+"]");
+}
+
+function getColumn(j){
+    return CTX.getContextInstances("SpecificColumn["+j+"]");
+}
+
+
+function getDiagonalP(i,j){
+    return CTX.getContextInstances("SpecificDiagonalP[" + i + "," + j + "]");
+}
+
+function getDiagonalN(i,j){
+    return CTX.getContextInstances("SpecificDiagonalN[" + i + "," + j + "]");
+}
+
 
 function getUpdatedCell(c){
     return getCell(c.row, c.col);

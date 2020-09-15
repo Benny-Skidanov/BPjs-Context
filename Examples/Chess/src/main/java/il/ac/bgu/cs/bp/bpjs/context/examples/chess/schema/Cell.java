@@ -12,9 +12,18 @@ import javax.persistence.*;
         @NamedQuery(name = "OccupiedByBlackPiece", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.color = 'Black'"), // Cell.WithBlackPiece
         @NamedQuery(name = "NotEmptyCell", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL"), // Cell.Nonempty
         @NamedQuery(name = "SpecificCell", query = "SELECT c FROM Cell c WHERE c.row=:row AND c.col=:col"), // Cell.
+        @NamedQuery(name = "SpecificRow", query = "SELECT c FROM Cell c WHERE c.row=:row"), // Cell.
+        @NamedQuery(name = "SpecificColumn", query = "SELECT c FROM Cell c WHERE c.col=:col"), // Cell.
+        @NamedQuery(name = "SpecificDiagonalP", query = "SELECT c FROM Cell c WHERE c.row =   c.col - :col + :row"), // Cell.
+        @NamedQuery(name = "SpecificDiagonalN", query = "SELECT c FROM Cell c WHERE c.row = - c.col + :col + :row"),
         @NamedQuery(name = "SpecificEmptyCell", query = "SELECT c FROM Cell c WHERE c.row=:row AND c.col=:col AND c.piece IS NULL"), // Cell.
         @NamedQuery(name = "PieceCell", query = "SELECT c FROM Cell c WHERE c.piece = :piece"), // Cell.
         @NamedQuery(name = "CellsWithPawn", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Pawn'"), // Cell.
+        @NamedQuery(name = "CellsWithRook", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Rook'"), // Cell.
+        @NamedQuery(name = "CellsWithBlackRook", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Rook' AND c.piece.color = 'Black'"), // Cell.
+        @NamedQuery(name = "CellsWithWhiteRook", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Rook' AND c.piece.color = 'White'"), // Cell.
+        @NamedQuery(name = "CellsWithBlackBishop", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Bishop' AND c.piece.color = 'Black'"), // Cell.
+        @NamedQuery(name = "CellsWithWhiteBishop", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Bishop' AND c.piece.color = 'White'"), // Cell.
         @NamedQuery(name = "CellsWithBlackPawn", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'Black'"), // Cell.
         @NamedQuery(name = "CellsWithWhitePawn", query = "SELECT c FROM Cell c WHERE c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'White'"), // Cell.
         @NamedQuery(name = "PromotionCellsWithBlackPawn", query = "SELECT c FROM Cell c WHERE c.row=0 AND c.piece IS NOT NULL AND c.piece.type = 'Pawn' AND c.piece.color = 'Black'"), // Cell.
